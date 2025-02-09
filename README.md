@@ -12,8 +12,8 @@ This project is a backend CRUD for managing drivers, trucks, and assignments usi
 1. Clone the repository:
 
    ```sh
-   git clone https://github.com/your-username/crud_drivers_trucks.git
-   cd crud_drivers_trucks
+   git clone https://github.com/your-username/loadsmart-backend.git
+   cd loadsmart-backend
    ```
 
 2. Create a virtual environment:
