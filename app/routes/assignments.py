@@ -3,22 +3,85 @@ from app import db
 from app.models import Driver, Truck, Assignment
 from app.utils.helpers import is_license_valid, parse_date
 
-bp = Blueprint('assignments', __name__, url_prefix='/assignments')
+# Blueprint para agrupar todas as rotas relacionadas a atribuições
+# Facilita a organização e manutenção do código
+assignments_bp = Blueprint('assignments', __name__, url_prefix='/assignments')
 
-@bp.route('/', methods=['GET'])
+@assignments_bp.route('/', methods=['GET'])
 def get_assignments():
+    """
+    Lista todas as atribuições cadastradas.
+    
+    Returns:
+        JSON: Lista de atribuições com seus dados
+        Status: 200 OK
+    
+    Exemplo de resposta:
+        [
+            {
+                "id": 1,
+                "driver_id": 1,
+                "truck_id": 1,
+                "start_date": "2024-01-01",
+                "end_date": null
+            }
+        ]
+    """
     current_app.logger.info("Fetching all assignments")
     assignments = Assignment.query.all()
-    return jsonify([assignment.to_dict() for assignment in assignments])
+    return jsonify([assignment.to_dict() for assignment in assignments]), 200
 
-@bp.route('/<int:assignment_id>', methods=['GET'])
+@assignments_bp.route('/<int:assignment_id>', methods=['GET'])
 def get_assignment(assignment_id):
+    """
+    Recupera os dados de uma atribuição específica.
+    
+    Args:
+        assignment_id (int): ID da atribuição
+    
+    Returns:
+        JSON: Dados da atribuição
+        Status: 200 OK ou 404 Not Found
+    
+    Exemplo de resposta:
+        {
+            "id": 1,
+            "driver_id": 1,
+            "truck_id": 1,
+            "start_date": "2024-01-01",
+            "end_date": null
+        }
+    """
     current_app.logger.info(f"Fetching assignment with ID {assignment_id}")
     assignment = Assignment.query.get_or_404(assignment_id)
-    return jsonify(assignment.to_dict())
+    return jsonify(assignment.to_dict()), 200
 
-@bp.route('/', methods=['POST'])
+@assignments_bp.route('/', methods=['POST'])
 def create_assignment():
+    """
+    Cria uma nova atribuição.
+    
+    Request Body:
+        JSON: {
+            "driver_id": 1,
+            "truck_id": 1,
+            "start_date": "2024-01-01",
+            "end_date": "2024-12-31"  # Opcional
+        }
+    
+    Returns:
+        JSON: Dados da atribuição criada
+        Status: 201 Created ou 400 Bad Request
+    
+    Exemplo de resposta:
+        {
+            "id": 1,
+            "driver_id": 1,
+            "truck_id": 1,
+            "start_date": "2024-01-01",
+            "end_date": "2024-12-31"
+        }
+    """
     data = request.get_json()
     driver_id = data.get("driver_id")
     truck_id = data.get("truck_id")
@@ -62,8 +125,35 @@ def create_assignment():
     current_app.logger.info(f"Assignment created with ID {assignment.id}")
     return jsonify(assignment.to_dict()), 201
 
-@bp.route('/<int:assignment_id>', methods=['PUT'])
+@assignments_bp.route('/<int:assignment_id>', methods=['PUT'])
 def update_assignment(assignment_id):
+    """
+    Atualiza os dados de uma atribuição existente.
+    
+    Args:
+        assignment_id (int): ID da atribuição
+    
+    Request Body:
+        JSON: {
+            "driver_id": 2,
+            "truck_id": 2,
+            "start_date": "2024-02-01",
+            "end_date": "2024-11-30"
+        }
+    
+    Returns:
+        JSON: Dados atualizados da atribuição
+        Status: 200 OK, 404 Not Found ou 400 Bad Request
+    
+    Exemplo de resposta:
+        {
+            "id": 1,
+            "driver_id": 2,
+            "truck_id": 2,
+            "start_date": "2024-02-01",
+            "end_date": "2024-11-30"
+        }
+    """
     current_app.logger.info(f"Updating assignment with ID {assignment_id}")
     assignment = Assignment.query.get_or_404(assignment_id)
     data = request.get_json()
@@ -108,8 +198,23 @@ def update_assignment(assignment_id):
     current_app.logger.info(f"Assignment with ID {assignment.id} updated successfully")
     return jsonify(assignment.to_dict())
 
-@bp.route('/<int:assignment_id>', methods=['DELETE'])
+@assignments_bp.route('/<int:assignment_id>', methods=['DELETE'])
 def delete_assignment(assignment_id):
+    """
+    Remove uma atribuição do sistema.
+    
+    Args:
+        assignment_id (int): ID da atribuição
+    
+    Returns:
+        JSON: Mensagem de sucesso
+        Status: 200 OK ou 404 Not Found
+    
+    Exemplo de resposta:
+        {
+            "message": "Atribuição removida com sucesso"
+        }
+    """
     current_app.logger.info(f"Deleting assignment with ID {assignment_id}")
     assignment = Assignment.query.get_or_404(assignment_id)
     db.session.delete(assignment)

@@ -3,20 +3,20 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from config import Config
 
-# Inicialização do SQLAlchemy como uma extensão Flask
-# Isso permite a separação da instância do banco de dados da aplicação
+# Inicialização do SQLAlchemy como uma extensão do Flask
+# Isso permite que a instância do banco de dados seja separada da aplicação
 db = SQLAlchemy()
 
-def create_app(config_class=Config):
+def create_app():
     """
-    Factory function para criar e configurar a aplicação Flask.
-    Segue o padrão de aplicação factory do Flask, permitindo:
-    - Múltiplas instâncias da aplicação
-    - Diferentes configurações para diferentes ambientes
-    - Testes mais fáceis com diferentes configurações
+    Função fábrica para criar e configurar a aplicação Flask.
+    Este padrão permite:
+    - Criar múltiplas instâncias da aplicação
+    - Configurar a aplicação de forma flexível
+    - Facilitar testes com diferentes configurações
     """
     app = Flask(__name__)
-    app.config.from_object(config_class)
+    app.config.from_object(Config)
     
     # Configuração do CORS para desenvolvimento
     # Permite requisições do frontend em localhost:3000
@@ -32,13 +32,13 @@ def create_app(config_class=Config):
     db.init_app(app)
     
     # Registro dos blueprints
-    # Organização modular das rotas por domínio
+    # Organiza as rotas em módulos separados
     from app.routes import drivers, trucks, assignments
-    app.register_blueprint(drivers.bp)
-    app.register_blueprint(trucks.bp)
-    app.register_blueprint(assignments.bp)
+    app.register_blueprint(drivers.drivers_bp)
+    app.register_blueprint(trucks.trucks_bp)
+    app.register_blueprint(assignments.assignments_bp)
     
-    # Criação das tabelas do banco de dados
+    # Criação das tabelas no banco de dados
     with app.app_context():
         db.create_all()
     

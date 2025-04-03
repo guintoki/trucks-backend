@@ -3,22 +3,91 @@ from app import db
 from app.models import Truck
 from app.utils.helpers import LICENSE_ORDER, validate_assignments
 
-bp = Blueprint('trucks', __name__, url_prefix='/trucks')
+# Blueprint para agrupar todas as rotas relacionadas a caminhões
+# Facilita a organização e manutenção do código
+trucks_bp = Blueprint('trucks', __name__, url_prefix='/trucks')
 
-@bp.route('/', methods=['GET'])
+@trucks_bp.route('/', methods=['GET'])
 def get_trucks():
+    """
+    Lista todos os caminhões cadastrados.
+    
+    Returns:
+        JSON: Lista de caminhões com seus dados
+        Status: 200 OK
+    
+    Exemplo de resposta:
+        [
+            {
+                "id": 1,
+                "model": "Volvo FH",
+                "plate": "ABC1234",
+                "min_license_type": "E"
+            }
+        ]
+    """
     current_app.logger.info("Fetching all trucks")
-    trucks = Truck.query.all()
-    return jsonify([truck.to_dict() for truck in trucks])
+    try:
+        trucks = Truck.query.all()
+        current_app.logger.info('Caminhões recuperados com sucesso')
+        return jsonify([truck.to_dict() for truck in trucks]), 200
+    except Exception as e:
+        current_app.logger.error(f'Erro ao recuperar caminhões: {str(e)}')
+        return jsonify({'error': 'Erro interno do servidor'}), 500
 
-@bp.route('/<int:truck_id>', methods=['GET'])
+@trucks_bp.route('/<int:truck_id>', methods=['GET'])
 def get_truck(truck_id):
+    """
+    Recupera os dados de um caminhão específico.
+    
+    Args:
+        truck_id (int): ID do caminhão
+    
+    Returns:
+        JSON: Dados do caminhão
+        Status: 200 OK ou 404 Not Found
+    
+    Exemplo de resposta:
+        {
+            "id": 1,
+            "model": "Volvo FH",
+            "plate": "ABC1234",
+            "min_license_type": "E"
+        }
+    """
     current_app.logger.info(f"Fetching truck with ID {truck_id}")
-    truck = Truck.query.get_or_404(truck_id)
-    return jsonify(truck.to_dict())
+    try:
+        truck = Truck.query.get_or_404(truck_id)
+        current_app.logger.info(f'Caminhão {truck_id} recuperado com sucesso')
+        return jsonify(truck.to_dict()), 200
+    except Exception as e:
+        current_app.logger.error(f'Erro ao recuperar caminhão {truck_id}: {str(e)}')
+        return jsonify({'error': 'Erro interno do servidor'}), 500
 
-@bp.route('/', methods=['POST'])
+@trucks_bp.route('/', methods=['POST'])
 def create_truck():
+    """
+    Cria um novo caminhão.
+    
+    Request Body:
+        JSON: {
+            "model": "Modelo do Caminhão",
+            "plate": "ABC1234",
+            "min_license_type": "E"  # A, B, C, D ou E
+        }
+    
+    Returns:
+        JSON: Dados do caminhão criado
+        Status: 201 Created ou 400 Bad Request
+    
+    Exemplo de resposta:
+        {
+            "id": 1,
+            "model": "Volvo FH",
+            "plate": "ABC1234",
+            "min_license_type": "E"
+        }
+    """
     data = request.get_json()
     plate = data.get("plate")
     min_license_type = data.get("min_license_type")
@@ -39,8 +108,33 @@ def create_truck():
     current_app.logger.info(f"Truck created with ID {truck.id}")
     return jsonify(truck.to_dict()), 201
 
-@bp.route('/<int:truck_id>', methods=['PUT'])
+@trucks_bp.route('/<int:truck_id>', methods=['PUT'])
 def update_truck(truck_id):
+    """
+    Atualiza os dados de um caminhão existente.
+    
+    Args:
+        truck_id (int): ID do caminhão
+    
+    Request Body:
+        JSON: {
+            "model": "Novo Modelo",
+            "plate": "XYZ9876",
+            "min_license_type": "D"
+        }
+    
+    Returns:
+        JSON: Dados atualizados do caminhão
+        Status: 200 OK, 404 Not Found ou 400 Bad Request
+    
+    Exemplo de resposta:
+        {
+            "id": 1,
+            "model": "Volvo FH Atualizado",
+            "plate": "XYZ9876",
+            "min_license_type": "D"
+        }
+    """
     current_app.logger.info(f"Updating truck with ID {truck_id}")
     truck = Truck.query.get_or_404(truck_id)
     data = request.get_json()
@@ -72,8 +166,23 @@ def update_truck(truck_id):
     current_app.logger.info(f"Truck with ID {truck.id} updated successfully")
     return jsonify(truck.to_dict())
 
-@bp.route('/<int:truck_id>', methods=['DELETE'])
+@trucks_bp.route('/<int:truck_id>', methods=['DELETE'])
 def delete_truck(truck_id):
+    """
+    Remove um caminhão do sistema.
+    
+    Args:
+        truck_id (int): ID do caminhão
+    
+    Returns:
+        JSON: Mensagem de sucesso
+        Status: 200 OK ou 404 Not Found
+    
+    Exemplo de resposta:
+        {
+            "message": "Caminhão removido com sucesso"
+        }
+    """
     current_app.logger.info(f"Deleting truck with ID {truck_id}")
     truck = Truck.query.get_or_404(truck_id)
     db.session.delete(truck)
