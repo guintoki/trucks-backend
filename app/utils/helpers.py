@@ -5,11 +5,11 @@ from app.models import Driver, Truck, Assignment
 # Mapeamento dos níveis de carteira para comparação
 # Usa valores numéricos para facilitar a comparação de níveis
 LICENSE_ORDER = {
-    "A": 1,  # Carteira mais básica
-    "B": 2,  # Veículos de passeio
-    "C": 3,  # Veículos de carga leve
-    "D": 4,  # Veículos de carga pesada
-    "E": 5,  # Veículos especiais
+    "A": 1,
+    "B": 2,
+    "C": 3,
+    "D": 4,
+    "E": 5,
 }
 
 def is_license_valid(driver_license, truck_min_license):

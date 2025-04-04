@@ -4,7 +4,7 @@ class Assignment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     driver_id = db.Column(db.Integer, db.ForeignKey('driver.id'), nullable=False)
     truck_id = db.Column(db.Integer, db.ForeignKey('truck.id'), nullable=False)
-    # We will store the date in the format YYYY-MM-DD
+    # Salva a data no formato YYYY-MM-DD
     date = db.Column(db.String(10), nullable=False)
 
     driver = db.relationship('Driver', backref=db.backref('assignments', cascade="all, delete-orphan"))

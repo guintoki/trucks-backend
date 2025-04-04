@@ -4,28 +4,11 @@ from app.models import Truck
 from app.utils.helpers import LICENSE_ORDER, validate_assignments
 
 # Blueprint para agrupar todas as rotas relacionadas a caminhões
-# Facilita a organização e manutenção do código
 trucks_bp = Blueprint('trucks', __name__, url_prefix='/trucks')
 
 @trucks_bp.route('/', methods=['GET'])
 def get_trucks():
-    """
-    Lista todos os caminhões cadastrados.
-    
-    Returns:
-        JSON: Lista de caminhões com seus dados
-        Status: 200 OK
-    
-    Exemplo de resposta:
-        [
-            {
-                "id": 1,
-                "model": "Volvo FH",
-                "plate": "ABC1234",
-                "min_license_type": "E"
-            }
-        ]
-    """
+    # Lista todos os caminhões cadastrados.
     current_app.logger.info("Fetching all trucks")
     try:
         trucks = Truck.query.all()
@@ -37,24 +20,7 @@ def get_trucks():
 
 @trucks_bp.route('/<int:truck_id>', methods=['GET'])
 def get_truck(truck_id):
-    """
-    Recupera os dados de um caminhão específico.
-    
-    Args:
-        truck_id (int): ID do caminhão
-    
-    Returns:
-        JSON: Dados do caminhão
-        Status: 200 OK ou 404 Not Found
-    
-    Exemplo de resposta:
-        {
-            "id": 1,
-            "model": "Volvo FH",
-            "plate": "ABC1234",
-            "min_license_type": "E"
-        }
-    """
+    # Recupera os dados de um caminhão específico.
     current_app.logger.info(f"Fetching truck with ID {truck_id}")
     try:
         truck = Truck.query.get_or_404(truck_id)
@@ -66,28 +32,7 @@ def get_truck(truck_id):
 
 @trucks_bp.route('/', methods=['POST'])
 def create_truck():
-    """
-    Cria um novo caminhão.
-    
-    Request Body:
-        JSON: {
-            "model": "Modelo do Caminhão",
-            "plate": "ABC1234",
-            "min_license_type": "E"  # A, B, C, D ou E
-        }
-    
-    Returns:
-        JSON: Dados do caminhão criado
-        Status: 201 Created ou 400 Bad Request
-    
-    Exemplo de resposta:
-        {
-            "id": 1,
-            "model": "Volvo FH",
-            "plate": "ABC1234",
-            "min_license_type": "E"
-        }
-    """
+    # Cria um novo caminhão.
     data = request.get_json()
     plate = data.get("plate")
     min_license_type = data.get("min_license_type")
@@ -96,7 +41,7 @@ def create_truck():
         current_app.logger.error("Invalid data for the truck")
         return jsonify({"error": "Invalid data for the truck"}), 400
 
-    # Check if a truck with the same plate already exists
+    # Valida se a placa já existe
     existing_truck = Truck.query.filter_by(plate=plate).first()
     if existing_truck:
         current_app.logger.error("A truck with this plate already exists")
@@ -110,31 +55,8 @@ def create_truck():
 
 @trucks_bp.route('/<int:truck_id>', methods=['PUT'])
 def update_truck(truck_id):
-    """
-    Atualiza os dados de um caminhão existente.
+    # Atualiza os dados de um caminhão existente.
     
-    Args:
-        truck_id (int): ID do caminhão
-    
-    Request Body:
-        JSON: {
-            "model": "Novo Modelo",
-            "plate": "XYZ9876",
-            "min_license_type": "D"
-        }
-    
-    Returns:
-        JSON: Dados atualizados do caminhão
-        Status: 200 OK, 404 Not Found ou 400 Bad Request
-    
-    Exemplo de resposta:
-        {
-            "id": 1,
-            "model": "Volvo FH Atualizado",
-            "plate": "XYZ9876",
-            "min_license_type": "D"
-        }
-    """
     current_app.logger.info(f"Updating truck with ID {truck_id}")
     truck = Truck.query.get_or_404(truck_id)
     data = request.get_json()
@@ -142,7 +64,7 @@ def update_truck(truck_id):
     min_license_type = data.get("min_license_type")
 
     if plate:
-        # Check if a truck with the same plate already exists
+        # Valida se a placa já existe
         existing_truck = Truck.query.filter_by(plate=plate).first()
         if existing_truck and existing_truck.id != truck_id:
             current_app.logger.error("A truck with this plate already exists")
@@ -156,7 +78,7 @@ def update_truck(truck_id):
 
     db.session.commit()
 
-    # Validate assignments after updating truck
+    # Valida as atribuições após a atualização do caminhão
     valid, message = validate_assignments()
     if not valid:
         db.session.rollback()
@@ -168,21 +90,7 @@ def update_truck(truck_id):
 
 @trucks_bp.route('/<int:truck_id>', methods=['DELETE'])
 def delete_truck(truck_id):
-    """
-    Remove um caminhão do sistema.
-    
-    Args:
-        truck_id (int): ID do caminhão
-    
-    Returns:
-        JSON: Mensagem de sucesso
-        Status: 200 OK ou 404 Not Found
-    
-    Exemplo de resposta:
-        {
-            "message": "Caminhão removido com sucesso"
-        }
-    """
+    # Remove um caminhão do sistema.
     current_app.logger.info(f"Deleting truck with ID {truck_id}")
     truck = Truck.query.get_or_404(truck_id)
     db.session.delete(truck)

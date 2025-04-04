@@ -4,17 +4,10 @@ from flask_cors import CORS
 from config import Config
 
 # Inicialização do SQLAlchemy como uma extensão do Flask
-# Isso permite que a instância do banco de dados seja separada da aplicação
 db = SQLAlchemy()
 
 def create_app():
-    """
-    Função fábrica para criar e configurar a aplicação Flask.
-    Este padrão permite:
-    - Criar múltiplas instâncias da aplicação
-    - Configurar a aplicação de forma flexível
-    - Facilitar testes com diferentes configurações
-    """
+    # Função para criar e configurar a aplicação Flask.
     app = Flask(__name__)
     app.config.from_object(Config)
     

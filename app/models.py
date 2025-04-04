@@ -5,7 +5,7 @@ class Driver(db.Model):
     """
     Modelo que representa um motorista no sistema.
     
-    Attributes:
+    Attr:
         id (int): Identificador único do motorista
         name (str): Nome completo do motorista
         license_type (str): Tipo da carteira de motorista (A-E)
@@ -58,10 +58,10 @@ class Truck(db.Model):
 
     def to_dict(self):
         """
-        Converte o objeto Truck para um dicionário.
+        Tipagem de dados para o objeto Truck para um dicionário.
         
         Returns:
-            dict: Representação do caminhão em formato JSON
+            formato JSON
         """
         return {
             'id': self.id,
@@ -76,7 +76,7 @@ class Assignment(db.Model):
     """
     Modelo que representa uma atribuição de motorista a um caminhão.
     
-    Attributes:
+    Attr:
         id (int): Identificador único da atribuição
         driver_id (int): ID do motorista atribuído
         truck_id (int): ID do caminhão atribuído
@@ -95,10 +95,7 @@ class Assignment(db.Model):
 
     def to_dict(self):
         """
-        Converte o objeto Assignment para um dicionário.
-        
-        Returns:
-            dict: Representação da atribuição em formato JSON
+        tipagem de dados para o objeto Assignment para um dicionário.
         """
         return {
             'id': self.id,
